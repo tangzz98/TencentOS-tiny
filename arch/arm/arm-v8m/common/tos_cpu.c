@@ -230,7 +230,7 @@ __KNL__ k_stack_t *cpu_task_stk_init(void *entry,
        1       : reserved, 0
        0       : reserved, 1
      */
-#if defined (TOS_CFG_CPU_ARM_FPU_EN) && (TOS_CFG_CPU_ARM_FPU_EN == 1U)
+#if defined (TOS_CFG_CPU_ARM_FPU_EN) && (TOS_CFG_CPU_ARM_FPU_EN == 1U) && (TOS_CFG_TRUSTZONE_EN == 0U)
     *--sp = (cpu_data_t)0xFFFFFFFDL;
 #endif
 
@@ -242,6 +242,25 @@ __KNL__ k_stack_t *cpu_task_stk_init(void *entry,
     *--sp = (cpu_data_t)0x06060606u;    /* R6       */
     *--sp = (cpu_data_t)0x05050505u;    /* R5       */
     *--sp = (cpu_data_t)0x04040404u;    /* R4       */
+
+#if TOS_CFG_TRUSTZONE_EN > 0u
+    /* EXC_RETURN = 0xFFFFFFFBC
+       Initial state: Thread mode +  non-floating-point state + PSP + non-secure
+       31 - 24 : EXC_RETURN flag, 0xFF
+       27 -  7 : reserved
+       6	   : 0, exception taken from the non-secure state
+       5	   : 1, do not stkip stacking of callee saved registers
+       4       : 1, basic stack frame
+       3       : 1, return to Thread mode
+       2       : 1, return to PSP
+       1       : reserved, 0
+       0       : 0, exception taken to non-secure state
+     */
+    *--sp = (cpu_data_t)0xFFFFFFFBCL;
+    *--sp = (cpu_data_t)stk_base;		/* PSPLIM	*/
+    /* The task's secure context ID */
+    *--sp = (cpu_data_t)K_SECURE_CTX_INVALID_ID;
+#endif
 
     return (k_stack_t *)sp;
 }

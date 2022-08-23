@@ -56,6 +56,10 @@ __API__ k_err_t tos_knl_init(void)
     tickless_init();
 #endif
 
+#if TOS_CFG_TRUSTZONE_EN > 0u
+    port_secure_ctx_init();
+#endif
+
     return K_ERR_NONE;
 }
 
@@ -251,7 +255,7 @@ __STATIC__ void knl_idle_entry(void *arg)
     arg = arg; // make compiler happy
 
     while (K_TRUE) {
-#if TOS_CFG_TASK_DYNAMIC_CREATE_EN > 0u
+#if TOS_CFG_OBJ_DYNAMIC_CREATE_EN > 0u
         task_free_all();
 #endif
 

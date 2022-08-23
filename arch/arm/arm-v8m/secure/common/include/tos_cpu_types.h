@@ -15,47 +15,26 @@
  * within TencentOS.
  *---------------------------------------------------------------------------*/
 
-#ifndef _TOS_KTYPES_H_
-#define  _TOS_KTYPES_H_
+#ifndef _TOS_CPU_TYPES_H_
+#define  _TOS_CPU_TYPES_H_
 
-#include <stdint.h>
-#include <stddef.h>
-
-typedef uint8_t             k_prio_t;
-typedef uint8_t             k_stack_t;
-typedef uint8_t             k_task_state_t;
-typedef struct k_task_st    k_task_t;
-
-typedef uint8_t             k_nesting_t;
-
-typedef uint16_t            k_opt_t;
-
-typedef uint16_t            k_sem_cnt_t;
-typedef uint32_t            k_event_flag_t;
-typedef uint16_t            k_barrier_cnt_t;
-typedef uint16_t            k_countdownlatch_cnt_t;
-
-typedef uint32_t            k_time_t;
-typedef uint32_t            k_timeslice_t;
-
-typedef uint32_t            k_cycle_t;
-
-#if TOS_CFG_CPU_DATA_SIZE == CPU_WORD_SIZE_08
-typedef uint32_t            k_tick_t;
+/* CPU address type based on address bus size.          */
+#if     (TOS_CFG_CPU_ADDR_SIZE == CPU_WORD_SIZE_32)
+typedef uint32_t    cpu_addr_t;
+#elif   (TOS_CFG_CPU_ADDR_SIZE == CPU_WORD_SIZE_16)
+typedef uint16_t    cpu_addr_t;
 #else
-typedef uint64_t            k_tick_t;
+typedef uint8_t     cpu_addr_t;
 #endif
 
-#if TOS_CFG_TRUSTZONE_EN > 0u
-typedef uint32_t                k_secure_ctx_handle_t;
+/* CPU data type based on data bus size.          */
+#if     (TOS_CFG_CPU_DATA_SIZE == CPU_WORD_SIZE_32)
+typedef uint32_t    cpu_data_t;
+#elif   (TOS_CFG_CPU_DATA_SIZE == CPU_WORD_SIZE_16)
+typedef uint16_t    cpu_data_t;
+#else
+typedef uint8_t     cpu_data_t;
 #endif
 
-#define K_TRUE              (1u)
-#define K_FALSE             (0u)
-
-#ifndef K_NULL
-#define  K_NULL             0
 #endif
-
-#endif /* _TOS_KTYPES_H_ */
 

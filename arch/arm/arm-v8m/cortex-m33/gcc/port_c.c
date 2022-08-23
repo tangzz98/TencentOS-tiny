@@ -43,6 +43,10 @@
 #include "tos_k.h"
 #include "core_cm33.h"
 
+#if TOS_CFG_TRUSTZONE_EN > 0u
+volatile k_secure_ctx_handle_t k_curr_secure_ctx = K_SECURE_CTX_INVALID_ID;
+#endif /* TOS_CFG_TRUSTZONE_EN */
+
 __PORT__ void port_cpu_reset(void)
 {
     NVIC_SystemReset();
@@ -252,4 +256,47 @@ __PORT__ void __NAKED__ HardFault_Handler(void)
 }
 
 #endif /* TOS_CFG_FAULT_BACKTRACE_EN */
+
+#if TOS_CFG_TRUSTZONE_EN > 0u
+__PORT__ void port_svc_handler_c(cpu_data_t *sp)
+{
+	cpu_addr_t pc;
+	cpu_data_t r0, r1;
+	uint8_t svc_number;
+	k_task_t *curr_task;
+	pc = (cpu_addr_t)sp[6];
+	svc_number = ((uint8_t *)pc)[-2];
+
+	switch(svc_number) {
+		case PORT_SVC_SECURE_CTX_ALLOC:
+		{
+			// stack size
+			r0 = sp[0];
+			curr_task = tos_task_curr_task_get();
+			k_curr_secure_ctx = secure_ctx_alloc((uint32_t)r0, (void *)curr_task);
+			if (k_curr_secure_ctx != K_SECURE_CTX_INVALID_ID) {
+				secure_ctx_load(k_curr_secure_ctx, curr_task);
+			}
+			break;
+		}
+		case PORT_SVC_SECURE_CTX_FREE:
+		{
+			// task handle
+			r0 = sp[0];
+			// secure context handle
+			r1 =sp[1];
+			secure_ctx_free((k_secure_ctx_handle_t)r1, (void *)r0);
+			if ((k_task_t *)r0 == tos_task_curr_task_get()) {
+				k_curr_secure_ctx = K_SECURE_CTX_INVALID_ID;
+			}
+			break;
+		}
+		case PORT_SVC_SECURE_CTX_INIT:
+		{
+			secure_ctx_init();
+			break;
+		}
+	}
+}
+#endif /* TOS_CFG_TRUSTZONE_EN */
 

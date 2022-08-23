@@ -307,5 +307,23 @@ __PORT__ void       port_standby_mode_enter(void);
 
 #endif
 
+#if TOS_CFG_TRUSTZONE_EN > 0u
+
+#define PORT_SVC_SECURE_CTX_ALLOC	0
+
+#define PORT_SVC_SECURE_CTX_FREE	1
+
+#define PORT_SVC_SECURE_CTX_INIT	2
+
+__PORT__ k_err_t	port_secure_ctx_alloc(uint32_t stk_size);
+
+__PORT__ void		port_secure_ctx_free(k_task_t *task);
+
+__PORT__ void		port_secure_ctx_free_curr(k_task_t *curr_task);
+
+__PORT__ void		port_secure_ctx_init(void);
+
+#endif
+
 #endif /* _PORT_H_ */
 

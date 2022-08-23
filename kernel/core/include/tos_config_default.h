@@ -104,6 +104,10 @@
 #ifndef TOS_CFG_FAULT_BACKTRACE_EN
 #define  TOS_CFG_FAULT_BACKTRACE_EN         0u
 #endif
+
+#ifndef TOS_CFG_TRUSTZONE_EN
+#define TOS_CFG_TRUSTZONE_EN				0u
+#endif
 /////////////////////////////////////////
 
 /////////////////////////////////////////
@@ -256,6 +260,10 @@
 
 #ifndef TOS_CFG_FAULT_BACKTRACE_EN
 #define  TOS_CFG_FAULT_BACKTRACE_EN         0u
+#endif
+
+#ifndef TOS_CFG_TRUSTZONE_EN
+#define TOS_CFG_TRUSTZONE_EN				0u
 #endif
 
 #endif /* TOS_CFG_EVENT_DRIVEN_EN */

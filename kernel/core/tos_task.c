@@ -207,6 +207,14 @@ __API__ k_err_t tos_task_destroy(k_task_t *task)
     }
 #endif
 
+#if TOS_CFG_TRUSTZONE_EN > 0u
+    if (task == k_curr_task) {
+    	port_secure_ctx_free_curr(task);
+    } else {
+    	port_secure_ctx_free(task);
+    }
+#endif
+
     return task_do_destroy(task);
 }
 
@@ -214,6 +222,9 @@ __API__ k_err_t tos_task_destroy(k_task_t *task)
 
 __STATIC__ void task_free(k_task_t *task)
 {
+#if TOS_CFG_TRUSTZONE_EN > 0u
+    port_secure_ctx_free(task);
+#endif
     tos_mmheap_free(task->stk_base);
     tos_mmheap_free(task);
 }
@@ -306,6 +317,9 @@ __API__ k_err_t tos_task_destroy_dyn(k_task_t *task)
     if (knl_is_self(task)) { // we are destroying ourself
         // in this situation, we cannot just free ourself's task stack because we are using it
         // we count on the idle task to free the memory
+    #if TOS_CFG_TRUSTZONE_EN > 0u
+    	port_secure_ctx_free_curr(task);
+    #endif
         tos_list_add(&task->dead_list, &k_dead_task_list);
     } else {
         task_free(task);
